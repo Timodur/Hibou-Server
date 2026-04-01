@@ -467,7 +467,7 @@ class DS2DY9250IAXA(BaseVendor):
     def _update_status(self) -> None:
         """Update internal status from PTZ camera."""
         if not self.is_initialized():
-            return
+            return False
 
         try:
             status = self._client.PTZCtrl.channels[self.CHANNEL_ID].status(method="get")
@@ -485,8 +485,11 @@ class DS2DY9250IAXA(BaseVendor):
                 )
             )
             self._status = status
+
+            return True
         except Exception as e:
             logger.error(f"Failed to get PTZ status: {e}")
+            return False
 
     def stop_continuous(self) -> None:
         """
@@ -603,9 +606,13 @@ class DS2DY9250IAXA(BaseVendor):
         Continuously update PTZ status in a separate thread.
         Send on the IPC status informations
         """
+
         ipc = get_ipc_handler()
         while True:
-            self._update_status()
+            # When network is lost, stop getting status and update system status
+            if not self._update_status():
+                break
+
             if status := self.get_status():
                 if "PTZStatus" in status and "AbsoluteHigh" in status["PTZStatus"]:
                     azimuth = status["PTZStatus"]["AbsoluteHigh"]["azimuth"]
