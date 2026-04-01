@@ -85,7 +85,6 @@ class FileAudioSource(GstreamerSource):
         pipeline_strings = []
         rec_hz = SETTINGS.AUDIO_REC_HZ
 
-        channel = 0
         for ch, directory in enumerate(self._audio_paths):
             """
             It is required to have many filesrc elements, because a multifilesrc is not designed to have multiple EOS
@@ -108,20 +107,20 @@ class FileAudioSource(GstreamerSource):
                 f"audio/x-raw, format=(string)F32LE, rate=(int){rec_hz}, channels=(int)1 ! "  # All files should contain only one channel.
                 f"identity sync=true ! "  # Throttle to real time
                 f"tee name=t "
-                f"t. ! appsink name=appsink_{ch} "
+                f"t. ! appsink name=appsink_{ch} async=false "
             )
 
             if self._enable_recording_saves:
-                os.makedirs(f"{save_fp}/{channel}", exist_ok=True)
-                os.makedirs(f"{save_fp}/{channel + 1}", exist_ok=True)
+                os.makedirs(f"{save_fp}/{channel_prefix}{ch}", exist_ok=True)
 
                 gst_pipeline_str += (
-                    f't. ! splitmuxsink location="{save_fp}/{channel_prefix}{channel}/%d.wav" '
+                    f't. ! splitmuxsink location="{save_fp}/{channel_prefix}{ch}/%d.wav" '
                     f"muxer=wavenc max-size-time={record_duration}"
                 )
 
+            print(gst_pipeline_str)
+
             pipeline_strings.append(gst_pipeline_str)
-            channel += 1
 
         # Our audios are F32LE, so each "element" is of size 4.
         super().__init__(pipeline_strings, int((rec_hz * record_duration / 1e9) * 4))
