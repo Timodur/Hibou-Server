@@ -10,6 +10,7 @@ from src.modules.audio.streaming import GstChannel
 from src.modules.audio.streaming.play import play_sample
 from src.settings import SETTINGS
 from src.helpers.ipc.base_ipc import get_ipc_handler
+from src.helpers.system_status import SystemStatusUpdater
 
 
 class AudioDispatcher:
@@ -47,8 +48,16 @@ class AudioDispatcher:
 
         self.analyzer = Analyzer(SETTINGS.AUDIO_REC_HZ, mic_infos)
 
+        self.system_status_updater = SystemStatusUpdater(
+            system_name="preamplifier",
+        )
+
+
     def process(self, audio_samples: list[GstChannel]):
         self.audio_queue.append(audio_samples)
+        
+        # Update system status when receiving audio data
+        self.system_status_updater.update()
 
         if SETTINGS.AUDIO_PLAYBACK:  # Only for debug purposes
             play_sample(audio_samples[0], 0)
@@ -58,6 +67,11 @@ class AudioDispatcher:
         self.probabilities_queue.append(prb)
 
         self.ipc.publish(SETTINGS.IPC_ACOUSTIC_DETECTION_TOPIC, "drone" if any(res) else "other")
+
+        # if any(res):
+        #     print("Drone detected")
+        # else:
+        #     print("No drone detected")
 
         i = 0
         for audio, pts in audio_samples:
