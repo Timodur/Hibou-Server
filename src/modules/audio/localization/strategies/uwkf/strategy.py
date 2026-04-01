@@ -1,6 +1,6 @@
 from src.modules.audio.localization.analyzer import AudioAnalyzer
 from src.modules.audio.localization.data import AudioBuffer, InferenceResult, MicInfo
-from src.arguments import args
+from src.settings import SETTINGS
 
 from typing import override
 import numpy as np
@@ -315,7 +315,8 @@ class Analyzer(AudioAnalyzer):
             r_angle=20.0,  # measurement noise — ~circ_std of 3-4° but trust less
         )
 
-        self.data = {"mag": [], "angle": [], "measured": [], "filtered": [], "circ_std": []}
+        if SETTINGS.AUDIO_STRATEGY_REPORT:
+            self.data = {"mag": [], "angle": [], "measured": [], "filtered": [], "circ_std": []}
 
     @override
     def push_buffer(self, buffer: AudioBuffer):
@@ -333,29 +334,28 @@ class Analyzer(AudioAnalyzer):
         measured_angle = _weighted_circular_mean(angles, mags)
         filtered_angle = self._ukf.update(measured_angle)
 
-        # --- Diagnostics -------------------------------------------------------
-        cstd = _circular_std(angles, mags / (mags.max() + 1e-12))
-        print(
-            f"  slices   : {np.round(angles, 1).tolist()}\n"
-            f"  mags     : {np.round(mags, 4).tolist()}\n"
-            f"  measured : {measured_angle:.1f}°\n"
-            f"  filtered : {filtered_angle:.1f}°\n"
-            f"  circ_std : {cstd:.1f}°\n"
-        )
-        # -----------------------------------------------------------------------
-
-        self.data["measured"].append(measured_angle)
-        self.data["filtered"].append(filtered_angle)
-        self.data["circ_std"].append(cstd)
-
         self.audio_buffers = {}
         self.inference_results = {}
 
-        with open("uwkf." + args.test_name + ".csv", 'w', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(self.data.keys())
-            columns = [np.asarray(val).tolist() for val in self.data.values()]
-            writer.writerows(zip_longest(*columns, fillvalue=''))
+        if SETTINGS.AUDIO_STRATEGY_REPORT:
+            cstd = _circular_std(angles, mags / (mags.max() + 1e-12))
+            print(
+                f"  slices   : {np.round(angles, 1).tolist()}\n"
+                f"  mags     : {np.round(mags, 4).tolist()}\n"
+                f"  measured : {measured_angle:.1f}°\n"
+                f"  filtered : {filtered_angle:.1f}°\n"
+                f"  circ_std : {cstd:.1f}°\n"
+            )
+
+            self.data["measured"].append(measured_angle)
+            self.data["filtered"].append(filtered_angle)
+            self.data["circ_std"].append(cstd)
+
+            with open("uwkf.csv", 'w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(self.data.keys())
+                columns = [np.asarray(val).tolist() for val in self.data.values()]
+                writer.writerows(zip_longest(*columns, fillvalue=''))
 
         return filtered_angle
 
@@ -380,8 +380,9 @@ class Analyzer(AudioAnalyzer):
 
             _angle = math.degrees(angle)
 
-            self.data["angle"].append(_angle)
-            self.data["mag"].append(mag)
+            if SETTINGS.AUDIO_STRATEGY_REPORT:
+                self.data["angle"].append(_angle)
+                self.data["mag"].append(mag)
 
             data.append((_angle, mag))
 

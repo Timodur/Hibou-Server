@@ -74,6 +74,7 @@ class Settings:
     AUDIO_STFT_SPECTRUM: bool = False  # Only for debug purposes
     AUDIO_RADAR: bool = False  # Only for debug purposes
     CV_VIDEO_PLAYBACK: bool = False  # Only for debug purposes
+    AUDIO_STRATEGY_REPORT: bool = False  # Only for debug purposes: generate detailed strategy info in a CSV
 
 def parse_list(value: str):
     """Split a comma-separated string and strip whitespace."""
