@@ -67,6 +67,7 @@ class Settings:
     IPC_VISION_DECISION_TOPIC: str
     IPC_VISION_ANGLE_TOPIC: str
     IPC_VISION_DETECTION_TOPIC: str
+    IPC_SYSTEM_STATUS_TOPIC: str
 
     AUDIO_PLAYBACK: bool = False  # Only for debug purposes
     AUDIO_ENERGY_SPECTRUM: bool = False  # Only for debug purposes
@@ -131,6 +132,7 @@ try:
         IPC_PROXY_XSUB_PORT=int(os.getenv("IPC_PROXY_XSUB_PORT")),
         IPC_PROXY_XPUB_PORT=int(os.getenv("IPC_PROXY_XPUB_PORT")),
         IPC_VIDEO_STREAMING_ANNOTATED_PORT=int(os.getenv("IPC_VIDEO_STREAMING_ANNOTATED_PORT")),
+        IPC_SYSTEM_STATUS_TOPIC=os.getenv("IPC_SYSTEM_STATUS_TOPIC"),
     )
 
 

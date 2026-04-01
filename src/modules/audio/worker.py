@@ -21,6 +21,7 @@ from src.modules.audio.streaming.play import play_sample
 from src.modules.audio.streaming.sources.file_source import FileAudioSource
 from src.modules.audio.streaming.sources.rtp_source import RTPAudioSource
 from src.settings import SETTINGS
+from src.helpers.system_status import SystemStatusUpdater
 
 
 class AudioWorker:
@@ -37,6 +38,10 @@ class AudioWorker:
         self._load_devices()
         # Get the source, either from a folder or from the network, based on command-line arguments
         self.source = self._get_source()
+
+        self.system_status_updater = SystemStatusUpdater(
+            system_name="worker:audio",
+        )
 
         try:
             self.run()
@@ -146,3 +151,5 @@ class AudioWorker:
             if radar_plot:
                 radar_plot.update()
                 phi_angle = (phi_angle + 5) % 360
+
+            self.system_status_updater.update()

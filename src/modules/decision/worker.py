@@ -8,6 +8,7 @@ import os
 import numpy as np
 
 logger = CustomLogger("decision").get_logger()
+from src.helpers.system_status import SystemStatusUpdater
 
 
 class DecisionWorker:
@@ -23,6 +24,10 @@ class DecisionWorker:
 
         self._reset = True
 
+        self.system_status_updater = SystemStatusUpdater(
+            system_name="worker:decision",
+        )
+
         try:
             self.run()
         except KeyboardInterrupt:
@@ -30,10 +35,10 @@ class DecisionWorker:
         finally:
             SingletonMeta.clear()
 
-    def _update_audio_inf(self, values):
+    def _update_audio_inf(self, topic, values):
         self.inf = values
 
-    def _update_audio_angle(self, angle):
+    def _update_audio_angle(self, topic, angle):
         self.angle = angle
 
     def run(self):
@@ -48,3 +53,5 @@ class DecisionWorker:
             elif self._reset:
                 self._reset = False
                 print("Waiting for angle update...")
+
+            self.system_status_updater.update()

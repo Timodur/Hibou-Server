@@ -10,6 +10,7 @@ import time
 
 from src.logger import CustomLogger
 from src.settings import SETTINGS
+from src.helpers.system_status import SystemStatusUpdater
 
 logger = CustomLogger("vision").get_logger()
 
@@ -113,6 +114,9 @@ class DS2DY9250IAXA(BaseVendor):
         except Exception as e:
             logger.error(f"Failed to connect to PTZ camera at {self._host}: {e}")
 
+        self.system_status_updater = SystemStatusUpdater(
+            system_name="ptz_camera",
+        )
         threading.Thread(target=self._update_status_loop, daemon=True).start()
 
     @staticmethod
@@ -607,4 +611,5 @@ class DS2DY9250IAXA(BaseVendor):
                     azimuth = status["PTZStatus"]["AbsoluteHigh"]["azimuth"]
                     elevation = status["PTZStatus"]["AbsoluteHigh"]["elevation"]
                     ipc.publish(SETTINGS.IPC_VISION_ANGLE_TOPIC, f"{azimuth},{elevation}")
+                    self.system_status_updater.update()
             time.sleep(0.25)

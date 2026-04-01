@@ -11,6 +11,7 @@ from src.modules.vision.devices.ptz_controller import PTZController
 from src.modules.vision.devices.vendors.hikvision.ds_2dy9250iax_a import DS2DY9250IAXA
 from src.modules.vision.tracking.ibvs_tracker import IBVSTracker
 from src.settings import SETTINGS
+from src.helpers.system_status import SystemStatusUpdater
 
 
 class VisionWorker:
@@ -44,6 +45,10 @@ class VisionWorker:
         )
         self.stream = PTZController("main_camera").get_video_stream()
         self.tracker = IBVSTracker()
+
+        self.system_status_updater = SystemStatusUpdater(
+            system_name="worker:vision",
+        )
 
         self.start_time = time.time()
 
@@ -111,3 +116,5 @@ class VisionWorker:
                             tilt_speed=tilt_vel,
                             clamp=True,
                         )
+
+            self.system_status_updater.update()
