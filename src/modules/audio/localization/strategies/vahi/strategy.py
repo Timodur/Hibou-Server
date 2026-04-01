@@ -18,8 +18,6 @@ HISTORY_LEN = 10        # how many past frames to fit the trend over
 TREND_THRESHOLD = 0.05  # min slope to extrapolate vs. fall back to circular mean
 
 
-# ── Extrapolation helpers (unchanged from power strategy) ────────────────────
-
 class _PolyRidge(BaseEstimator, RegressorMixin):
     def __init__(self, degree: int = 2):
         self.degree = degree
@@ -92,8 +90,6 @@ def extrapolate_angle(angles_deg: np.ndarray, degree: int = 2) -> float:
                                         ransac_x.predict(t_next)[0])))
 
 
-# ── STFT helper ───────────────────────────────────────────────────────────────
-
 def compute_stfts(
     signals: np.ndarray,
     nfft: int,
@@ -112,8 +108,6 @@ def compute_stfts(
         )
     return X
 
-
-# ── Analyzer ──────────────────────────────────────────────────────────────────
 
 class Analyzer(AudioAnalyzer):
     def __init__(self, sample_rate: int, mic_infos: list[MicInfo]):

@@ -153,20 +153,18 @@ class Analyzer(AudioAnalyzer):
             self._velocity_est = 0.0
             return measured_angle
 
-        # --- unwrap angle difference to [-180, 180]
+        # unwrap angle difference to [-180, 180]
         delta = (measured_angle - self._angle_est + 180) % 360 - 180
 
-        # --- predict
         predicted_angle = self._angle_est + self._velocity_est * dt
 
-        # --- innovation (measurement residual)
+        # measurement residual
         residual = delta
 
-        # --- update
         self._angle_est = predicted_angle + alpha * residual
         self._velocity_est = self._velocity_est + (beta * residual) / dt
 
-        # --- wrap back to [-180, 180] or [0, 360]
+        # wrap back to [-180, 180] or [0, 360]
         self._angle_est = (self._angle_est + 180) % 360 - 180
 
         return self._angle_est

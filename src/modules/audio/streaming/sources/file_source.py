@@ -1,10 +1,7 @@
 from src.modules.audio.streaming.sources.gstreamer_source import GstreamerSource
 from src.settings import SETTINGS
-import soundfile as sf
-import glob
 import os
 import math
-from pathlib import Path
 
 
 def get_wav_dir_bounds(directory: str):
@@ -16,9 +13,9 @@ def get_wav_dir_bounds(directory: str):
             numeric_wav_files.append(int(name))
 
     if numeric_wav_files:
-        return (min(numeric_wav_files), max(numeric_wav_files))
+        return min(numeric_wav_files), max(numeric_wav_files)
     else:
-        return (-math.inf, math.inf)
+        return -math.inf, math.inf
 
 
 class FileAudioSource(GstreamerSource):
@@ -117,8 +114,6 @@ class FileAudioSource(GstreamerSource):
                     f't. ! splitmuxsink location="{save_fp}/{channel_prefix}{ch}/%d.wav" '
                     f"muxer=wavenc max-size-time={record_duration}"
                 )
-
-            print(gst_pipeline_str)
 
             pipeline_strings.append(gst_pipeline_str)
 

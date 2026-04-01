@@ -200,10 +200,6 @@ class AngleUKF:
         self.x: np.ndarray | None = None
         self.P: np.ndarray = np.array([[180.0 ** 2]])
 
-    # ------------------------------------------------------------------
-    # Internals
-    # ------------------------------------------------------------------
-
     @staticmethod
     def _f(x: np.ndarray) -> np.ndarray:
         """Process model: angle is constant between steps (random-walk)."""
@@ -224,10 +220,6 @@ class AngleUKF:
     def _wrap_diff(a: np.ndarray, b: np.ndarray) -> np.ndarray:
         return np.array([_wrap(a[0] - b[0])])
 
-    # ------------------------------------------------------------------
-    # Public API
-    # ------------------------------------------------------------------
-
     def update(self, measured_angle_deg: float) -> float:
         """
         Feed one new angle measurement.
@@ -241,7 +233,6 @@ class AngleUKF:
 
         sp = self._sp
 
-        # ── PREDICT ────────────────────────────────────────────────────
         sigmas = sp.sigma_points(self.x, self.P)
         sigmas_f = np.array([self._f(s) for s in sigmas])
 
@@ -252,7 +243,6 @@ class AngleUKF:
             dx = self._wrap_diff(s, x_pred)
             P_pred += sp.Wc[i] * np.outer(dx, dx)
 
-        # ── UPDATE ─────────────────────────────────────────────────────
         sigmas_h = np.array([self._h(s) for s in sigmas_f])
 
         z_pred_sin = np.dot(sp.Wm, np.sin(np.radians(sigmas_h[:, 0])))

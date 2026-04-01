@@ -1,5 +1,5 @@
-from src.acoustic_analysis.analyzer import AudioAnalyzer
-from src.acoustic_analysis.data import AudioBuffer, InferenceResult, MicInfo
+from src.modules.audio.localization.analyzer import AudioAnalyzer
+from src.modules.audio.localization.data import AudioBuffer, InferenceResult, MicInfo
 from scipy import signal as sig
 from typing import override
 
