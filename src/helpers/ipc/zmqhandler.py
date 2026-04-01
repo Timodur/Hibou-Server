@@ -5,6 +5,7 @@ from typing import Callable
 
 import zmq
 from src.helpers.ipc.base_ipc import BaseIPC
+from src.settings import SETTINGS
 
 _PUB_POST_CONNECT_DELAY_S = 0.15
 
@@ -13,9 +14,9 @@ from src.helpers.decorators import singleton
 @singleton
 class ZmqHandler(BaseIPC):
     # Publisher binds here
-    XSUB_PORT = 5556
+    XSUB_PORT = SETTINGS.IPC_PROXY_XSUB_PORT
     # Subscriber connects there
-    XPUB_PORT = 5557
+    XPUB_PORT = SETTINGS.IPC_PROXY_XPUB_PORT
 
     def __init__(self):
         self.context = zmq.Context()

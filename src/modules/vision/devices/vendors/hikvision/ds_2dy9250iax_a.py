@@ -98,7 +98,7 @@ class DS2DY9250IAXA(BaseVendor):
         self.rtsp_stream.start()
 
         if not self.rtsp_stream.is_opened():
-            logger.error("❌ Cannot open RTSP stream. Check the URL or credentials.")
+            logger.error("Cannot open RTSP stream. Check the URL or credentials.")
             logger.error(
                 f"RTSP URL: rtsp://{username}:XXX@{host}:{rtsp_port}/Streaming/Channels/10{video_channel}/"
             )
@@ -109,9 +109,9 @@ class DS2DY9250IAXA(BaseVendor):
             self._client = Client(
                 f"http://{self._host}", self._username, self._password
             )
-            logger.info(f"✅ Connected to PTZ camera at {self._host}")
+            logger.info(f"Connected to PTZ camera at {self._host}")
         except Exception as e:
-            logger.error(f"❌ Failed to connect to PTZ camera at {self._host}: {e}")
+            logger.error(f"Failed to connect to PTZ camera at {self._host}: {e}")
 
         threading.Thread(target=self._update_status_loop, daemon=True).start()
 
@@ -592,7 +592,7 @@ class DS2DY9250IAXA(BaseVendor):
         if hasattr(self, "rtsp_stream") and self.rtsp_stream is not None:
             self.rtsp_stream.stop()
             self.rtsp_stream = None
-            logger.info("📷 RTSP stream released.")
+            logger.info("RTSP stream released.")
 
     def _update_status_loop(self):
         """

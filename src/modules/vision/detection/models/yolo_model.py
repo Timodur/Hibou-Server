@@ -14,13 +14,13 @@ class YOLOModel:
     def __init__(self, model_path: Path):
         try:
             self.model = YOLO(model_path)
-            logger.info(f"✅ Loaded YOLO model: {model_path}")
+            logger.info(f"Loaded YOLO model: {model_path}")
 
             device = "cuda" if torch.cuda.is_available() else "cpu"
             self.model.to(device)
             logger.info(f"YOLO Using device: {device}")
         except Exception as e:
-            logger.error(f"❌ Failed to load YOLO model: {e}")
+            logger.error(f"Failed to load YOLO model: {e}")
             raise
 
     def track(self, frame):

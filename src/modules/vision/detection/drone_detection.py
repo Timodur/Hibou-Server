@@ -1,10 +1,10 @@
+from src.modules.vision.streaming.video_streaming_publisher import VideoStreamingPublisher
 from src.modules.vision.streaming.video_source import VideoSource
 from .detection_recorder import DetectionRecording
 from ultralytics.engine.results import Results
 from .models.yolo_model import YOLOModel
 from collections import deque
 from pathlib import Path
-
 import threading
 import time
 
@@ -43,6 +43,8 @@ class DroneDetection:
 
         self.results_queue = deque(maxlen=1)
 
+        self.ipc_publisher = VideoStreamingPublisher()
+
         logger.info(f"DroneDetection initialized with model: {model_type}")
 
     def _run_detection(self, display: bool = True):
@@ -74,6 +76,7 @@ class DroneDetection:
 
             if self.enable_recording or display:
                 annotated_frame = results[0].plot()
+                self.ipc_publisher.publish(frame, annotated_frame)
 
                 if self.enable_recording:
                     self.recording.update_frame(annotated_frame)
