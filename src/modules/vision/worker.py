@@ -114,16 +114,12 @@ class VisionWorker:
 
             if time.time() - self.start_time > 5:
                 controls = self.tracker.update(best_box)
-                print("Timee")
 
                 # If we're not already tracking a drone, we can follow the decision system's command.
-                if controls is None:
-                    ctl = PTZController("main_camera")
-                    print("Updating", self._angle_updated)
+                if controls is None or best_box is None:
                     if self._angle_updated:
                         self._angle_updated = False
-                        print("Target:", int(self._target_angle * 10))
-                        ctl.set_absolute_ptz_position(pan=int(self._target_angle * 10))
+                        PTZController("main_camera").set_absolute_ptz_position(pan=self._target_angle)
                 else:
                     pan_vel, tilt_vel, zoom_vel = controls
 

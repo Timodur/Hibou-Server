@@ -79,10 +79,12 @@ class DecisionWorker:
                 self._angle_updated = False
                 self._inference_updated = False
 
-                angle = (self._strategy.decide(
+                angle = self._strategy.decide(
                     tuple(self.angles),
                     tuple(self.inferences),
-                ) + SETTINGS.CAM_ANGLE_OFFSET + 360.0) % 360.0
+                )
+                # Apply offset between the cam's 0° and the mic in the 0° direction
+                angle = (angle + SETTINGS.CAM_ANGLE_OFFSET + 360.0) % 360.0
 
                 self.ipc.publish(SETTINGS.IPC_DECISION_ANGLE_TOPIC, f"{angle}")
                 print("decision angle:", angle)
