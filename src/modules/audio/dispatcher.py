@@ -56,7 +56,7 @@ class AudioDispatcher:
 
         serialized_preds = str([int(pred) for pred in res])[1:-1]
         self.ipc.publish(SETTINGS.IPC_ACOUSTIC_DETECTION_TOPIC, serialized_preds)
-        print(res)
+
         if any(res):
             print("Drone detected")
         else:
@@ -78,7 +78,6 @@ class AudioDispatcher:
             i += 1
 
         angle = self.analyzer.get_angle()
-        print("angle: ", angle)
         self.ipc.publish(SETTINGS.IPC_ACOUSTIC_ANGLE_TOPIC, f"{float(angle)}")
 
     def get_last_channels(self) -> list[GstChannel] | None:

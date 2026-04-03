@@ -59,7 +59,6 @@ class Analyzer(AudioAnalyzer):
         flags = [self.inference_results.get(i, False) for i in range(n)]
 
         run = _last_consecutive_true_run(flags)
-        print("run: ", run)
         try:
             if run is None:
                 angle = 0.0
